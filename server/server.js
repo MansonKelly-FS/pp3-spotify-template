@@ -2,13 +2,16 @@ require("dotenv").config();
 const express = require("express");
 const port = process.env.PORT;
 const cors = require("cors");
+const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require("mongoose");
-const axios = require("axios");
-const qs = require("qs");
+const spotifyRouter = require('./routes/spotify');
 
+
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.json());
+app.use('/spotify/v1', spotifyRouter)
 
 // server
 app.listen(port, () => {
@@ -22,31 +25,3 @@ mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
 const db = mongoose.connection;
 db.on("error", (error) => console.error(error));
 db.once("open", () => console.log("Database Connection Established"));
-
-// get authorization token
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const auth_token = Buffer.from(
-  `${CLIENT_ID}:${CLIENT_SECRET}`,
-  "utf-8"
-).toString("base64");
-
-const getAuth = async () => {
-  try {
-    // post request for access token
-    const token_url = "https://accounts.spotify.com/api/token";
-    const data = qs.stringify({ grant_type: "client_credentials" });
-
-    const response = await axios.post(token_url, data, {
-      headers: {
-        Authorization: `Basic ${auth_token}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    // return access token
-    return response.data.access_token;
-  } catch (error) {
-    console.error(error);
-  }
-};
