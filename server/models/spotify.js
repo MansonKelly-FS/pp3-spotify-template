@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); 
+const mongoose = require("mongoose");
 
 const tokenSchema = new mongoose.Schema({
   access_token: {
@@ -14,10 +14,10 @@ const tokenSchema = new mongoose.Schema({
     default: Date.now,
     required: true,
   },
-    expires_in: {
-     type: Date, 
+  expires_in: {
+    type: Date,
     expires: 3600,
   },
 });
 
-module.exports = mongoose.model("Token", tokenSchema); 
+module.exports = mongoose.model("Token", tokenSchema);
