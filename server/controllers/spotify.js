@@ -22,6 +22,7 @@ const getToken = async () => {
       },
     });
     let jwt = new Token(response.data);
+    jwt.save(); 
     console.log(response.data);
     console.log(jwt);
     return jwt;
