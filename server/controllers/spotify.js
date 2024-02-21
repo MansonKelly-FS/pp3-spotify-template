@@ -10,6 +10,8 @@ const auth_token = Buffer.from(
   "utf-8"
 ).toString("base64");
 
+const now = new Date().getTime();
+
 const getToken = async () => {
   try {
     const token_url = "https://accounts.spotify.com/api/token";
@@ -22,9 +24,10 @@ const getToken = async () => {
       },
     });
     let jwt = new Token(response.data);
-    jwt.save(); 
     console.log(response.data);
-    console.log(jwt);
+    jwt.expires_in = new Date().getTime() + response.data.expires_in;
+    jwt.save(); 
+        console.log(jwt);
     return jwt;
   } catch (error) {
     console.error(error);
