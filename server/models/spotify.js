@@ -17,7 +17,7 @@ const tokenSchema = new mongoose.Schema({
   expires_in: {
     type: Date,
     default: Date.now,
-  }
-} );
+  },
+});
 
 module.exports = mongoose.model("Token", tokenSchema);

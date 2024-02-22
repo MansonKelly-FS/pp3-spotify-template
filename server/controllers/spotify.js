@@ -25,7 +25,10 @@ const getToken = async () => {
     });
     let jwt = new Token(response.data);
     console.log(response.data);
-    jwt.expires_in = new Date().getTime() + response.data.expires_in;
+    jwt.expires_in = new Date(
+      new Date().setHours(new Date().getHours() + 1)
+        //.getTime() + 5 /* expires after 5 min */ * 60000
+    );
     jwt.save(); 
         console.log(jwt);
     return jwt;
