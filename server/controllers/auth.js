@@ -72,6 +72,21 @@ exports.callback = async (req, res) => {
   }
 };
 
+exports.status = async (req, res) => { 
+  const { refresh_token } = req.query;
+  
+  Token.findOne({ refresh_token: refresh_token })
+    .exec()
+    .then((Token) => {
+          if (Token && Token.expires_in > now) {
+            res.json({ status: "true" });
+          } else {
+            res.json({ status: "false" });
+          }
+    }
+  )
+}
+
 exports.logout = async (req, res) => {
   return res.status(200).json({ message: "logged out" });
 };
