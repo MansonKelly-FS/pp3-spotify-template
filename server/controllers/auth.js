@@ -56,10 +56,9 @@ exports.callback = async (req, res) => {
     });
 
     let jwt = new Token(response.data);
-    console.log(response.data);
     jwt.expires_in = new Date(new Date().setHours(new Date().getHours() + 1));
     jwt.save();
-    console.log(jwt);
+    console.log("jwt" + jwt);
 
     return res.status(200).json({ message: "callback handler", jwt });
   } catch (error) {
@@ -108,14 +107,22 @@ exports.refresh = async (req, res) => {
 
 
 exports.search = async (req, res) => {
- 
     const token = Token.findOne().where('expires_in').gte(now).exec()
       .then((token) => {
       console.log(token)
       }).catch((error) => {
-      console.error(error)
+        console.error('no valid jwt found', error)
     })
 
+  const { access_token } = token; 
+
+  // const { data } = await axios.get("https://api.spotify.com/v1/me", {
+  //   headers: {
+  //     Authorization: `Bearer ${access_token}`,
+  //   },
+  // });
+  // console.log("Data", data);
+  // res.json({ data });
 
   await axios({
     method: "GET",
@@ -126,11 +133,11 @@ exports.search = async (req, res) => {
       limit: 10,
     },
     headers: {
-      Authorization: "Bearer " + token.access_token,
+      Authorization: `Bearer ${access_token}`,
       "Content-Type": "application/json",
     },
   })
-    .then((data ) => {
+    .then(({ data }) => {
       res.json(data);
     })
     .catch((error) => {
