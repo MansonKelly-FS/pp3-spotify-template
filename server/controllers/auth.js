@@ -16,21 +16,21 @@ const now = new Date().getTime();
 
 exports.login = (req, res) => {
   try {
-  console.log("start auth flow");
+    console.log("start auth flow");
 
-  const state = randomstring.generate(16);
-  res.cookie(stateKey, state);
+    const state = randomstring.generate(16);
+    res.cookie(stateKey, state);
 
-  const scope = "user-read-private user-read-email";
+    const scope = "user-read-private user-read-email";
 
-  const queryParams = querystring.stringify({
-    client_id: CLIENT_ID,
-    response_type: "code",
-    redirect_uri: REDIRECT_URI,
-    scope: scope,
-    state: state,
-  });
-  res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
+    const queryParams = querystring.stringify({
+      client_id: CLIENT_ID,
+      response_type: "code",
+      redirect_uri: REDIRECT_URI,
+      scope: scope,
+      state: state,
+    });
+    res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
   } catch (error) {
     console.error(error);
   }
@@ -55,37 +55,31 @@ exports.callback = async (req, res) => {
       },
     });
 
-        let jwt = new Token(response.data);
-        console.log(response.data);
-        jwt.expires_in = new Date(
-          new Date().setHours(new Date().getHours() + 1)
-        );
-        jwt.save();
-        console.log(jwt);
-    
-    return res
-      .status(200)
-      .json({ message: "callback handler", jwt });
-  }
-  catch (error) {
-        console.error(error);
+    let jwt = new Token(response.data);
+    console.log(response.data);
+    jwt.expires_in = new Date(new Date().setHours(new Date().getHours() + 1));
+    jwt.save();
+    console.log(jwt);
+
+    return res.status(200).json({ message: "callback handler", jwt });
+  } catch (error) {
+    console.error(error);
   }
 };
 
-exports.status = async (req, res) => { 
+exports.status = async (req, res) => {
   const { refresh_token } = req.query;
-  
+
   Token.findOne({ refresh_token: refresh_token })
     .exec()
     .then((Token) => {
-          if (Token && Token.expires_in > now) {
-            res.json({ status: "true" });
-          } else {
-            res.json({ status: "false" });
-          }
-    }
-  )
-}
+      if (Token && Token.expires_in > now) {
+        res.json({ status: "true" });
+      } else {
+        res.json({ status: "false" });
+      }
+    });
+};
 
 exports.logout = async (req, res) => {
   return res.status(200).json({ message: "logged out" });
@@ -110,4 +104,36 @@ exports.refresh = async (req, res) => {
   return res
     .status(200)
     .json({ message: "refresh token", data: response.data });
+};
+
+
+exports.search = async (req, res) => {
+ 
+    const token = Token.findOne().where('expires_in').gte(now).exec()
+      .then((token) => {
+      console.log(token)
+      }).catch((error) => {
+      console.error(error)
+    })
+
+
+  await axios({
+    method: "GET",
+    url: "https://api.spotify.com/v1/search",
+    params: {
+      type: "playlist,artist,track",
+      q: req.query.q,
+      limit: 10,
+    },
+    headers: {
+      Authorization: "Bearer " + token.access_token,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((data ) => {
+      res.json(data);
+    })
+    .catch((error) => {
+      res.json(error);
+    });
 };
