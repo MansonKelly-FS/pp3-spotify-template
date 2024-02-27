@@ -5,13 +5,13 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require("mongoose");
-const spotifyRouter = require('./routes/spotify');
+const routeHandler = require('./routes/index');
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.json());
-app.use('/spotify/v1', spotifyRouter)
+app.use('/api/v1', routeHandler)
 
 // server
 app.listen(port, () => {
@@ -25,3 +25,4 @@ mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
 const db = mongoose.connection;
 db.on("error", (error) => console.error(error));
 db.once("open", () => console.log("Database Connection Established"));
+
