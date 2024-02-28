@@ -107,40 +107,36 @@ exports.refresh = async (req, res) => {
 
 
 exports.search = async (req, res) => {
-    const token = Token.findOne().where('expires_in').gte(now).exec()
-      .then((token) => {
-      console.log(token)
-      }).catch((error) => {
-        console.error('no valid jwt found', error)
-    })
-
-  const { access_token } = token; 
-
-  // const { data } = await axios.get("https://api.spotify.com/v1/me", {
-  //   headers: {
-  //     Authorization: `Bearer ${access_token}`,
-  //   },
-  // });
-  // console.log("Data", data);
-  // res.json({ data });
-
-  await axios({
-    method: "GET",
-    url: "https://api.spotify.com/v1/search",
-    params: {
-      type: "playlist,artist,track",
-      q: req.query.q,
-      limit: 10,
-    },
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-      "Content-Type": "application/json",
-    },
-  })
-    .then(({ data }) => {
-      res.json(data);
+  const jwt = Token.findOne()
+    .where("expires_in")
+    .gte(now)
+    .exec()
+    .then((jwt) => {
+      console.log("jwt", jwt);
+      const { access_token } = jwt;
+      console.log("access token >>>", access_token);
+      
+      axios({
+        method: "GET",
+        url: "https://api.spotify.com/v1/search",
+        params: {
+          type: "playlist,artist,track",
+          q: req.query.q,
+          limit: 3,
+        },
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then(({ data }) => {
+          res.json(data);
+        })
+        .catch((error) => {
+          res.json(error);
+        });
     })
     .catch((error) => {
-      res.json(error);
+      console.error("no valid jwt found", error);
     });
 };
