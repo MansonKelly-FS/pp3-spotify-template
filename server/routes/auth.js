@@ -7,6 +7,5 @@ router.get("/status", status);
 router.get("/callback", callback); 
 router.get("/logout", logout); 
 router.get('/refresh', refresh); 
-router.get('/search', search);
 
 module.exports = router
