@@ -1,5 +1,6 @@
 import React from 'react'; 
 import { PiSpotifyLogo, PiHouse, PiSignOut } from "react-icons/pi";
+import { Link } from 'react-router-dom';
 
 export default class Nav extends React.Component {
     render() {
@@ -12,8 +13,8 @@ export default class Nav extends React.Component {
 			<input type="text" name="search" placeholder="Search" />
 		</form>
 		<span className="navIcons">
-			<a><PiHouse /></a>
-			<a><PiSignOut /></a>
+			<Link to='/'><PiHouse /></Link>
+			<Link to='/logout'><PiSignOut /></Link>
 		</span>
 	</nav>
         );
