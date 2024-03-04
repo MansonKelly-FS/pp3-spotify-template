@@ -1,15 +1,25 @@
 import React from 'react';
-import Input from './Input';
+import { useState } from 'react'; 
 
-const Searchbar = (props) => {
+
+const Searchbar = ({ onSubmit }) => {
+  const [term, setTerm] = useState("");
+
+  const handleChange = (event) => {
+    console.log("event.target.value:", event.target.value);
+    setTerm(event.target.value)
+  };
+
+
     return (
-      <form onSubmit={props.search}>
-        <Input
+      <form onSubmit={onSubmit}>
+        <input
           id="search"
           type="text"
           name="search"
-          value={props.search}
+          value={term}
           placeholder="Search"
+          onChange={handleChange}
         />
       </form>
     );

@@ -137,7 +137,10 @@ input[type="submit"] {
 .card {
   display: flex;
   gap: 1rem;
+  min-width: 300px; 
   & .cardImg img {
+    width: 150px; 
+		height: 150px; 
     border-radius: 8px;
     border: 1px solid var(--border-color);
   }

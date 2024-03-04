@@ -59,7 +59,16 @@ exports.callback = async (req, res) => {
     jwt.expires_in = new Date(new Date().setHours(new Date().getHours() + 1));
     jwt.save();
     console.log("jwt" + jwt);
-
+    
+    if (jwt) {
+      console.log("jwt to query params"); 
+      const queryParams = querystring.stringify({
+        access_token: jwt.access_token,
+        refresh_token: jwt.refresh_token,
+        expires_in: jwt.expires_in,
+      }); 
+      return res.redirect(`http://localhost:3000/?${queryParams}`)
+    }
     return res.status(200).json({ message: "callback handler", jwt });
   } catch (error) {
     console.error(error);
@@ -67,12 +76,14 @@ exports.callback = async (req, res) => {
 };
 
 exports.status = async (req, res) => {
-  const { refresh_token } = req.query;
-
-  Token.findOne({ refresh_token: refresh_token })
+  const jwt = Token.findOne()
+    .where("expires_in")
+    .gte(now)
     .exec()
-    .then((Token) => {
-      if (Token && Token.expires_in > now) {
+    .then((jwt) => {
+      console.log("jwt", jwt);
+      const { access_token } = jwt;
+      if (jwt && jwt.expires_in > now) {
         res.json({ status: "true" });
       } else {
         res.json({ status: "false" });
